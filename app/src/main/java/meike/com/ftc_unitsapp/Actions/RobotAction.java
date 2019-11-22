@@ -1,10 +1,13 @@
-package org.firstinspires.ftc.teamcode.Actions;
+package meike.com.ftc_unitsapp.Actions;
 
 public class RobotAction {
     public robotActions action;
     public double paramter;
 
     public RobotAction(String a){
+        if (a == null || a.length() < 6){
+            return;
+        }
         a.toLowerCase();
         String[] b = a.split(":");
         paramter = Double.parseDouble(b[1]);
