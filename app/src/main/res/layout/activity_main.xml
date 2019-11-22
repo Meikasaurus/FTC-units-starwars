@@ -80,7 +80,7 @@
     <EditText
         android:id="@+id/StartPos"
         android:layout_width="240dp"
-        android:layout_height="48dp"
+        android:layout_height="0dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="40dp"
         android:ems="10"
