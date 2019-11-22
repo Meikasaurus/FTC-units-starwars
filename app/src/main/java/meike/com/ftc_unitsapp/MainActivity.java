@@ -19,10 +19,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import meike.com.ftc_unitsapp.Actions.RobotAction;
+
 public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
     private View view;
     boolean isRed;
+    public RobotAction[] actions;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,9 +37,30 @@ public class MainActivity extends AppCompatActivity {
         // Do something in response to button
         this.view = view;
         Intent intent = new Intent(this, DisplayMessageActivity.class);
-        EditText editText = (EditText) findViewById(R.id.StartPos);
-        String message = editText.getText().toString();
-        Vector2 a = InputCheck(message);
+        //startpos
+        EditText startPos = (EditText) findViewById(R.id.StartPos);
+        String message = startPos.getText().toString();
+        Vector2 a = InputCheckPos(message);
+
+        //actions
+        //action 1
+        EditText action1 = (EditText) findViewById(R.id.Action1);
+        String action1s = action1.getText().toString();
+        CreateAction(action1s);
+        //action 2
+        EditText action2 = (EditText) findViewById(R.id.Action2);
+        String action2s = action2.getText().toString();
+        CreateAction(action2s);
+        //action 3
+        EditText action3 = (EditText) findViewById(R.id.Action3);
+        String action3s = action3.getText().toString();
+        CreateAction(action3s);
+        //action 4
+        EditText action4 = (EditText) findViewById(R.id.Action4);
+        String action4s = action4.getText().toString();
+        CreateAction(action4s);
+
+
         try {
             WriteToFile(a, !isRed);
         } catch (JSONException e) {
@@ -46,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public Vector2 InputCheck (String Input) {
+    public Vector2 InputCheckPos(String Input) {
         Input = Input.toLowerCase();
         Vector2 pos;
         switch (Input) {
@@ -82,12 +106,14 @@ public class MainActivity extends AppCompatActivity {
         }
         return pos;
     }
+
     public void WriteToFile (Vector2 Input, boolean isBlue) throws JSONException {
         JSONObject JSONinput;
         JSONinput = new JSONObject();
         JSONinput.put("blueAlliance", isBlue);
         JSONinput.put("x", Input.X);
         JSONinput.put("y", Input.Y);
+        JSONinput.put("actions", actions);
 
         File file = new File(getPublicAlbumStorageDir("FTCunits"), "startpos.json" );
         if (!file.canWrite()){
@@ -100,9 +126,8 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
+
     /**gets the public image folder */
     public  static File getPublicAlbumStorageDir(String albumName) {
         // Get the directory for the user's public pictures directory.
@@ -112,6 +137,15 @@ public class MainActivity extends AppCompatActivity {
             Log.println(1, "Status","Failed to create directory");
         }
         return file;
+    }
+
+    public void CreateAction (String s){
+        if (s != null && s.length() > 5){
+            RobotAction a = new RobotAction(s);
+            if (a.action != null){
+                actions[actions.length] = a;
+            }
+        }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
