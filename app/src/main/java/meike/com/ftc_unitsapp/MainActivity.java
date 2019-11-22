@@ -4,20 +4,31 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Debug;
 import android.os.Environment;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.JsonWriter;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Console;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 import meike.com.ftc_unitsapp.Actions.RobotAction;
 
@@ -25,12 +36,13 @@ public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
     private View view;
     boolean isRed;
-    public RobotAction[] actions;
+    public List<RobotAction> actions;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         verifyStoragePermissions(this);
+        actions = new ArrayList<RobotAction>();
     }
     /** Called when the user taps the Send button */
     public void sendMessage(View view) {
@@ -113,15 +125,25 @@ public class MainActivity extends AppCompatActivity {
         JSONinput.put("blueAlliance", isBlue);
         JSONinput.put("x", Input.X);
         JSONinput.put("y", Input.Y);
-        JSONinput.put("actions", actions);
-
+        JSONArray array = new JSONArray();
+        if (actions != null) {
+            Log.d("status", "actions is not null");
+            for (int j = 0; j < actions.size(); j++)
+            {
+                RobotAction a = actions.get(j);
+                JSONObject sa = a.toJson();
+                array.put(sa);
+                Log.d("status", "found action: " + a.action);
+            }
+            JSONinput.put("actions", array);
+        }
         File file = new File(getPublicAlbumStorageDir("FTCunits"), "startpos.json" );
         if (!file.canWrite()){
             Log.println(1,"Error","File not created properly");
         }
         try {
             FileWriter a = new FileWriter(file);
-            a.write(JSONinput.toString());
+            a.write(JSONinput.toString(2));
             a.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -143,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
         if (s != null && s.length() > 5){
             RobotAction a = new RobotAction(s);
             if (a.action != null){
-                actions[actions.length] = a;
+                actions.add(a);
             }
         }
     }

@@ -1,16 +1,24 @@
 package meike.com.ftc_unitsapp.Actions;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class RobotAction {
     public robotActions action;
-    public double paramter;
+    public double paramater;
 
     public RobotAction(String a){
         if (a == null || a.length() < 6){
             return;
         }
         a.toLowerCase();
-        String[] b = a.split(":");
-        paramter = Double.parseDouble(b[1]);
+        if (a.contains(":")) {
+            String[] b = a.split(":");
+
+            if (b != null && b.length > 1) {
+                paramater = (double) Double.parseDouble(b[1]);
+            }
+
         switch (b[0]) {
             case "wait":
                 action = robotActions.wait;
@@ -25,5 +33,17 @@ public class RobotAction {
                 action = robotActions.wait;
                 break;
         }
+        }
+    }
+
+    public JSONObject toJson () {
+        JSONObject a = new JSONObject();
+        try {
+            a.put("action", action);
+            a.put("parameter", paramater);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return a;
     }
 }
