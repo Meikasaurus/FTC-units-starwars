@@ -9,12 +9,14 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.JsonWriter;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -136,21 +138,38 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("status", "found action: " + a.action);
             }
             JSONinput.put("actions", array);
+            Log.d("status", "array length" + array.length());
         }
-        File file = new File(getPublicAlbumStorageDir("FTCunits"), "startpos.json" );
+        File file = null;
+        boolean hasPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+        if (!hasPermission) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    REQUEST_WRITE_STORAGE);
+        } else {
+            // You are allowed to write external storage:
+             file = new File(getPublicAlbumStorageDir("FTCunits"), "startpos.json" );
+        }
+
         if (!file.canWrite()){
             Log.println(1,"Error","File not created properly");
         }
         try {
             FileWriter a = new FileWriter(file);
-            a.write(JSONinput.toString(2));
+            String output = JSONinput.toString(2);
+            Log.d("status", output);
+            a.write(output);
+            a.flush();
             a.close();
+            Log.d("status", "wrote file to " + file.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    /**gets the public image folder */
+
+
+    /**gets the public documents foler */
     public  static File getPublicAlbumStorageDir(String albumName) {
         // Get the directory for the user's public pictures directory.
         File file = new File(Environment.getExternalStoragePublicDirectory(
@@ -199,7 +218,11 @@ public class MainActivity extends AppCompatActivity {
                     PERMISSIONS_STORAGE,
                     REQUEST_EXTERNAL_STORAGE
             );
+            Log.d("Permissions", "Requesting permissions");
         }
     }
+
+    public static final int REQUEST_WRITE_STORAGE = 112;
+
 
 }
